@@ -1,0 +1,90 @@
+# Entorno local de Águilas Boxeo Hualpén
+#   npm run setup:env    -> genera .env.local
+#   npm run db:up        -> Postgres (:54332) + API estilo Supabase (:54331)   (luego:  npm run dev)
+#   npm run stack:up     -> además levanta la app Next.js en Docker (perfil "full")
+#   npm run tools:up     -> Adminer en http://localhost:8080  (perfil "tools")
+#
+# Mapeo con Supabase:  db = Postgres · postgrest+gateway = API REST (/rest/v1)
+name: aguilas-gym
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: urpi_management_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: urpi_management_db
+      AUTHENTICATOR_PASSWORD: ${AUTHENTICATOR_PASSWORD}
+    ports:
+      - "${DB_PORT:-54332}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db/init.sh:/docker-entrypoint-initdb.d/10-init.sh:ro
+      - ./supabase/migrations:/migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d urpi_management_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    container_name: urpi_management_postgrest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${AUTHENTICATOR_PASSWORD}@db:5432/urpi_management_db
+      PGRST_DB_SCHEMAS: boxing_gym
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_MAX_ROWS: "10000"
+      PGRST_LOG_LEVEL: warn
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: urpi_management_gateway
+    restart: unless-stopped
+    depends_on:
+      - postgrest
+    ports:
+      - "${API_PORT:-54331}:80"
+    volumes:
+      - ./docker/gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  app:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: urpi_management_app
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    environment:
+      SUPABASE_URL: http://gateway
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_DB_SCHEMA: boxing_gym
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      AUTH_SESSION_HOURS: ${AUTH_SESSION_HOURS:-8}
+      APP_TIMEZONE: ${APP_TIMEZONE:-America/Santiago}
+    ports:
+      - "3001:3001"
+
+  adminer:
+    profiles: ["tools"]
+    image: adminer:4
+    container_name: urpi_management_adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

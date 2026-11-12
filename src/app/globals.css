@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Paleta URPI — modo claro cálido (crema), coherente con el ámbar de marca */
+    --background: 40 35% 97%;              /* crema suave #F8F3E9 */
+    --foreground: 28 18% 14%;              /* carbón cálido, no negro puro */
+    --card: 40 42% 99%;                    /* crema casi blanco, ligera elevación */
+    --card-foreground: 28 18% 14%;
+    --popover: 40 42% 99%;
+    --popover-foreground: 28 18% 14%;
+    --primary: 38 92% 47%;                 /* amber-600, con más contraste sobre blanco */
+    --primary-foreground: 210 40% 98%;
+    --action: 243 75% 59%;                 /* indigo-600 */
+    --action-to: 245 58% 51%;              /* indigo-700 */
+    --action-foreground: 0 0% 100%;
+    --secondary: 40 28% 93%;               /* crema medio para superficies secundarias */
+    --secondary-foreground: 28 20% 20%;
+    --muted: 40 28% 93%;
+    --muted-foreground: 30 10% 42%;        /* gris cálido para texto secundario */
+    --accent: 40 28% 93%;
+    --accent-foreground: 28 20% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 160 84% 33%;                /* emerald-600 */
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 47%;
+    --warning-foreground: 210 40% 98%;
+    --border: 40 22% 88%;                  /* borde crema, no gris frío */
+    --input: 40 22% 88%;
+    --ring: 38 92% 47%;
+    --radius: 0.5rem;
+    /* categóricos de dataviz */
+    --c1: #2a78d6;
+    --c2: #eb6834;
+    --c3: #1baf7a;
+    --grid: hsl(40 22% 88%);
+  }
+
+  .dark {
+    /* Paleta URPI — Sistema Core (chakana andina tecnológica) */
+    --background: 224 49% 8%;              /* #0A0F1D */
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;                   /* slate-900 #0F172A */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 38 92% 50%;                 /* amber-500 #F59E0B — marca y cambio de clave */
+    --primary-foreground: 224 49% 8%;
+    --action: 243 75% 59%;                 /* indigo-600 #4F46E5 — CTA y focus del login */
+    --action-to: 245 58% 51%;              /* indigo-700 #4338CA */
+    --action-foreground: 0 0% 100%;
+    --secondary: 217 33% 17.5%;            /* slate-800 #1E293B */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17.5%;
+    --muted-foreground: 215 20% 65%;       /* slate-400 #94A3B8 */
+    --accent: 217 33% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 350 89% 60%;            /* rose-500 */
+    --destructive-foreground: 210 40% 98%;
+    --success: 160 84% 39%;                /* emerald-500 — checklist cumplido */
+    --success-foreground: 224 49% 8%;
+    --warning: 38 92% 50%;                 /* banner de cambio obligatorio */
+    --warning-foreground: 224 49% 8%;
+    --border: 217 33% 17.5%;
+    --input: 217 33% 17.5%;
+    --ring: 38 92% 50%;
+    --c1: #3987e5;
+    --c2: #d95926;
+    --c3: #199e70;
+    --grid: hsl(217 33% 17.5%);
+  }
+}
+
+@layer base {
+  html { color-scheme: light; }
+  .dark { color-scheme: dark; }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
