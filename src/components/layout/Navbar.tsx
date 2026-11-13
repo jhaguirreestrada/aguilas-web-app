@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { ChevronDown, KeyRound, LogOut, Menu, Moon, Sun } from 'lucide-react'
+import { Bot, ChevronDown, KeyRound, LogOut, Menu, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { MENU } from '@/components/layout/menu'
 import { brand } from '@/lib/brand'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
+import { AssistantChat } from '@/components/AssistantChat'
 import type { SessionUser } from '@/shared/types'
 
 interface Props {
@@ -22,6 +23,7 @@ export function Navbar({ onMenuClick, sidebarCollapsed, user, onLogout }: Props)
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
   const [pwd, setPwd] = useState(false)
+  const [chat, setChat] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => setMounted(true), [])
@@ -72,6 +74,9 @@ export function Navbar({ onMenuClick, sidebarCollapsed, user, onLogout }: Props)
                   <button onClick={() => { setOpen(false); setPwd(true) }} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground/80 hover:bg-accent rounded-xl transition-colors w-full text-left">
                     <KeyRound className="w-4 h-4 text-primary" /><span>Cambiar contraseña</span>
                   </button>
+                  <button onClick={() => { setOpen(false); setChat(true) }} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground/80 hover:bg-accent rounded-xl transition-colors w-full text-left">
+                    <Bot className="w-4 h-4 text-primary" /><span>Asistente virtual</span>
+                  </button>
                   <button onClick={onLogout} className="flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 rounded-xl transition-colors w-full text-left">
                     <LogOut className="w-4 h-4" /><span>Cerrar sesión</span>
                   </button>
@@ -82,6 +87,7 @@ export function Navbar({ onMenuClick, sidebarCollapsed, user, onLogout }: Props)
         </div>
       </nav>
       <ChangePasswordModal open={pwd} onClose={() => setPwd(false)} />
+      <AssistantChat open={chat} onClose={() => setChat(false)} />
     </>
   )
 }
