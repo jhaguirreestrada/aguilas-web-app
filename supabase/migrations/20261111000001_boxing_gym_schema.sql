@@ -1,5 +1,5 @@
 -- =============================================================================
---  urpi_management_db · esquema `boxing_gym`
+--  postgres · esquema `boxing_gym`
 --  Migración 1/5 — Tablas, restricciones, índices y triggers de `updated_at`.
 --
 --  Convenciones

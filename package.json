@@ -14,7 +14,7 @@
     "db:down": "docker compose --env-file .env.local down",
     "db:reset": "docker compose --env-file .env.local down -v && docker compose --env-file .env.local up -d db postgrest gateway",
     "db:logs": "docker compose --env-file .env.local logs -f db postgrest",
-    "db:psql": "docker compose --env-file .env.local exec db psql -U postgres -d urpi_management_db",
+    "db:psql": "docker compose --env-file .env.local exec db psql -U postgres -d postgres",
     "stack:up": "docker compose --env-file .env.local --profile full up -d --build",
     "tools:up": "docker compose --env-file .env.local --profile tools up -d adminer",
     "setup:env": "node scripts/gen-env.mjs"

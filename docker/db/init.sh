@@ -25,4 +25,4 @@ for f in /migrations/*.sql; do
   echo ">> aplicando $(basename "$f")"
   psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -f "$f"
 done
-echo ">> base urpi_management_db lista (esquema boxing_gym)"
+echo ">> base postgres lista (esquema boxing_gym)"

@@ -1,7 +1,7 @@
 # Águilas Boxeo Hualpén — Gestión (Next.js + Supabase/Postgres)
 
 Migración de `aguilas-boxeo-hualpen.html` a **Next.js 14 + Postgres (Supabase)**.
-BD `urpi_management_db`, esquema `boxing_gym`. UI basada en el Front base (URPI).
+BD `postgres`, esquema `boxing_gym`. UI basada en el Front base (URPI).
 
 ## Arranque local (todo dockerizado)
 ```bash
