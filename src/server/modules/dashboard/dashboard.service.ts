@@ -54,7 +54,7 @@ export class DashboardService {
     const [al, pg, vt, pr, eg] = await Promise.all([
       this.students.listSummaries(),
       this.payments.listAll(),
-      this.sales.list({ from: `${months[0]}-01`, status: 'completed' }),
+      this.sales.list({ paid_from: `${months[0]}-01`, status: 'completed' }),
       this.products.listAll(),
       this.expenses.listAll(),
     ])
@@ -66,8 +66,9 @@ export class DashboardService {
       const k = monthKey(p.paid_on)
       if (k in mem) { mem[k] += p.amount; nPay[k]++ }
     })
+    // Las ventas cuentan en el mes en que se cobran (las «por cobrar» no son ingreso todavía).
     vt.forEach((v) => {
-      const k = monthKey(v.sold_on)
+      const k = monthKey(v.paid_on ?? v.sold_on)
       if (k in ven) { ven[k] += v.total; cost[k] += v.cost_total; nSales[k]++ }
     })
     al.forEach((a) => {
@@ -82,7 +83,8 @@ export class DashboardService {
       if (k in egr) {
         egr[k] += e.amount
         egrCat[e.category] = (egrCat[e.category] || 0) + e.amount
-        ;(egrCatMonth[k] ||= {})[e.category] = e.amount
+        ;const m = (egrCatMonth[k] ||= {})
+        m[e.category] = (m[e.category] || 0) + e.amount
       }
     })
 
@@ -108,11 +110,11 @@ export class DashboardService {
     active.forEach((a) => { const c = a.category || 'Sin categoría'; byCat[c] = (byCat[c] || 0) + 1 })
 
     const units: Record<string, number> = {}
-    vt.filter((v) => monthKey(v.sold_on) >= months[0]).forEach((v) =>
+    vt.filter((v) => monthKey(v.paid_on ?? v.sold_on) >= months[0]).forEach((v) =>
       v.items.forEach((i) => { units[i.product_name] = (units[i.product_name] || 0) + i.quantity }))
     const byMethod: Record<string, number> = {}
     pg.filter((p) => monthKey(p.paid_on) >= months[0]).forEach((p) => { byMethod[p.payment_method] = (byMethod[p.payment_method] || 0) + p.amount })
-    vt.filter((v) => monthKey(v.sold_on) >= months[0]).forEach((v) => { byMethod[v.payment_method] = (byMethod[v.payment_method] || 0) + v.total })
+    vt.filter((v) => monthKey(v.paid_on ?? v.sold_on) >= months[0]).forEach((v) => { byMethod[v.payment_method] = (byMethod[v.payment_method] || 0) + v.total })
 
     const pending = active
       .filter((a) => a.payment_status.key === 'OVERDUE' || a.payment_status.key === 'DUE_SOON')

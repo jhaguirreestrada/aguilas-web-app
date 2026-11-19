@@ -17,6 +17,7 @@ import { SalesRepository } from './modules/sales/sales.repository'
 import { SalesService } from './modules/sales/sales.service'
 import { ExpensesRepository, ExpensesService } from './modules/expenses/expenses.service'
 import { ActivitiesRepository, ActivitiesService } from './modules/activities/activities.service'
+import { CashierService } from './modules/cashier/cashier.service'
 import { DashboardService } from './modules/dashboard/dashboard.service'
 import { BackupService } from './modules/backup/backup.service'
 
@@ -52,6 +53,7 @@ export function createServices(ctx: RequestContext) {
     sales: new SalesService(salesRepo, settingsRepo),
     expenses: new ExpensesService(expensesRepo),
     activities: new ActivitiesService(activitiesRepo),
+    cashier: new CashierService(paymentsRepo, salesRepo),
     dashboard: new DashboardService(students, paymentsRepo, salesRepo, productsRepo, expensesRepo),
     backup: new BackupService(db, settingsRepo),
   }

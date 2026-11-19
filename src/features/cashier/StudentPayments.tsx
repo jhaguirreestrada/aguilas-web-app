@@ -5,7 +5,7 @@ import { CreditCard, History, Search, Users } from 'lucide-react'
 import { api, errMsg, qs } from '@/lib/api-client'
 import { useDebounced } from '@/hooks/useDebounced'
 import { useNotify } from '@/hooks/useNotify'
-import { Empty, Field, PageHeader, Tabs } from '@/components/gym/ui'
+import { Empty, Field, Tabs } from '@/components/gym/ui'
 import { PaymentHistoryGrid, PaymentModal, PaymentPill, StudentStatusPill } from '@/features/common/payments'
 import { fmtDate, money } from '@/shared/format'
 import { planLabel } from '@/shared/domain/payments'
@@ -13,7 +13,8 @@ import type { Payment, StudentSummary } from '@/shared/types'
 
 type Tab = 'data' | 'history'
 
-export default function PaymentsPage() {
+/** Pestaña «Pago alumnos» de Caja y Ventas: busca al alumno, muestra su último pago y registra pagos de mensualidad. */
+export default function StudentPayments() {
   const notify = useNotify()
   const [q, setQ] = useState('')
   const dq = useDebounced(q, 250)
@@ -58,9 +59,10 @@ export default function PaymentsPage() {
   const e = selected?.payment_status
 
   return (
-    <div className="gym">
-      <PageHeader title="Pagos" subtitle="Busca al alumno por RUT o por nombre y apellido para ver sus datos y último pago" />
+    <>
       <div className="card">
+        <h2>Pago de alumnos</h2>
+        <p className="sub">Busca al alumno por RUT o por nombre y apellido para ver sus datos y último pago</p>
         <div className="toolbar" style={{ margin: 0 }}>
           <div style={{ flex: 3 }}>
             <Field label="RUT o Nombre + Apellido">
@@ -144,6 +146,6 @@ export default function PaymentsPage() {
       {paying && selected && (
         <PaymentModal student={selected} onClose={() => setPaying(false)} onDone={() => refreshSelected(selected.id).catch((er) => notify.error(errMsg(er)))} />
       )}
-    </div>
+    </>
   )
 }

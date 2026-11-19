@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, CreditCard, Users, ShoppingCart, Package, Wallet, ClipboardList, UserCog, SlidersHorizontal,
+  LayoutDashboard, Banknote, Users, Package, Wallet, ClipboardList, UserCog, SlidersHorizontal,
   type LucideIcon,
 } from 'lucide-react'
 import { SETTINGS_SECTIONS } from '@/features/settings/sections'
@@ -10,9 +10,8 @@ export interface MenuItem { href: string; label: string; icon: LucideIcon; child
 /** Orden del menú: «Usuario» va justo después de «Planificación». «Configuración» agrupa sus mantenedores en submenús. */
 export const MENU: MenuItem[] = [
   { href: '/dashboard', label: 'Paneles', icon: LayoutDashboard },
-  { href: '/pagos', label: 'Pagos', icon: CreditCard },
+  { href: '/caja', label: 'Caja y Ventas', icon: Banknote },
   { href: '/alumnos', label: 'Alumnos', icon: Users },
-  { href: '/ventas', label: 'Ventas', icon: ShoppingCart },
   { href: '/productos', label: 'Productos', icon: Package },
   { href: '/egresos', label: 'Egresos', icon: Wallet },
   { href: '/planificacion', label: 'Planificación', icon: ClipboardList },

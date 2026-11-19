@@ -12,6 +12,8 @@ import { PaymentHistoryModal, PaymentModal, PaymentPill, StudentStatusPill } fro
 import { StudentModal } from '@/features/students/StudentModal'
 import { fmtDate, norm } from '@/shared/format'
 import { cleanRut } from '@/shared/rut'
+import { waUrl } from '@/lib/whatsapp'
+import { WhatsAppIcon } from '@/components/gym/icons'
 import type { StudentSummary } from '@/shared/types'
 
 export default function StudentsPage() {
@@ -33,6 +35,13 @@ export default function StudentsPage() {
       (!f.status || a.status === f.status) &&
       (!f.pay || a.payment_status.key === f.pay))
   }, [data, f])
+
+  const whatsapp = (s: StudentSummary) => {
+    if (!cfg) return
+    const url = waUrl(s, cfg)
+    if (!url) return notify.error('El alumno no tiene celular registrado')
+    window.open(url, '_blank', 'noopener')
+  }
 
   const remove = async (a: StudentSummary) => {
     const n = a.payments_count
@@ -78,6 +87,7 @@ export default function StudentsPage() {
             { h: 'Editar', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Editar" onClick={() => setEditing(a.id)}><Pencil /></button></div> },
             { h: 'Eliminar', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Eliminar" style={{ color: 'hsl(var(--destructive))' }} onClick={() => remove(a)}><Trash2 /></button></div> },
             { h: 'Historial de Pagos', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Historial de pagos" onClick={() => setHistory(a)}><History /></button></div> },
+            { h: 'WhatsApp', cls: 'c', cell: (a) => <div className="acts"><button className="btn sm ico" title="Enviar WhatsApp" onClick={() => whatsapp(a)}><WhatsAppIcon /></button></div> },
           ]}
         />
       </div>

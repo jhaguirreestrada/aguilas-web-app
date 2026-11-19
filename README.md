@@ -16,7 +16,7 @@ Otros: `npm run db:reset` (borra y recrea la BD), `npm run stack:up` (app tambi�
 ## Guía de uso del sistema
 > Esta sección es también la base de conocimiento del **Asistente virtual** (ver más abajo). Manténla actualizada.
 
-Menú lateral: Paneles · Pagos · Alumnos · Ventas · Productos · Egresos · Planificación · Usuario (Mantenimiento de Usuario | Log de Auditoría) · Configuración.
+Menú lateral: Paneles · Caja y Ventas · Alumnos · Productos · Egresos · Planificación · Usuario (Mantenimiento de Usuario | Log de Auditoría) · Configuración.
 Arriba a la derecha, al pulsar el nombre del usuario: **Cambiar contraseña**, **Asistente virtual** y **Cerrar sesión**. El botón sol/luna cambia entre tema claro y oscuro.
 La sesión se cierra sola tras un tiempo sin actividad (configurable en Configuración › General); antes aparece un aviso.
 
@@ -27,16 +27,16 @@ Cuatro pestañas:
 - **Egresos**: egresos del mes, promedio mensual, mayor gasto, egresos por mes y por tipo, ingresos vs egresos, ranking de gastos.
 - **Proyección**: «¿Cómo va este mes?» (ingresos a la fecha, por cobrar, esperado según historial), utilidad, cobertura de gastos, punto de equilibrio y proyección con método seleccionable.
 
-### Pagos (`/pagos`)
-Se busca al alumno por **RUT** o por **nombre y apellido**. Pestaña *Datos*: muestra el último pago y permite registrar uno nuevo (plan, monto, tipo de pago, fecha; el vencimiento se calcula según la duración del plan). Pestaña *Historial*: todos los pagos del alumno.
-Estados de pago: **Vigente**, **Por Vencer** (dentro de los días de advertencia configurados), **Vencido** y **Sin pagos**.
-
 ### Alumnos (`/alumnos`)
 Mantenedor de alumnos. Filtros: RUT, nombre, estado del alumno y estado del último pago. Acciones por fila: ver **historial de pagos**, **editar** y **eliminar**. Al crear/editar se piden RUT (validado con dígito verificador), nombres, apellidos, fecha de nacimiento, sexo, peso (kg), teléfono, correo y notas; la **categoría de peso** (Amateur) se asigna sola según sexo y peso. Se guarda historial de pesos. Un alumno puede darse **de baja** (retiro) y **reactivarse**. Los datos de pago iniciales se pueden registrar al crear el alumno.
 
-### Ventas (`/ventas`)
-- **Nueva venta**: elegir producto y cantidad (se pueden agregar varias líneas), tipo de pago, alumno (opcional) y comentario. Descuenta stock automáticamente.
-- **Historial de ventas**: filtros por fechas, tipo de pago y estado; **ver detalle** y **anular venta** (devuelve el stock).
+### Caja y Ventas (`/caja`)
+Está entre *Paneles* y *Alumnos*. Reúne en un solo lugar los cobros del gimnasio. Cinco pestañas:
+- **Pago alumnos**: se busca al alumno por **RUT** o por **nombre y apellido**. Muestra sus datos y último pago, permite **Realizar Pago** (plan, monto, tipo de pago, fecha; el vencimiento se calcula según la duración del plan) y ver el **historial de pagos**. Estados de pago: **Vigente**, **Por Vencer** (dentro de los días de advertencia configurados), **Vencido** y **Sin pagos**.
+- **Nueva venta**: *1 Productos a vender* (filtro por categoría —Boxeo, Bebidas, Snacks, Otros—, búsqueda por nombre o código de barras + Enter), *2 Detalle de la venta* (cantidades, total) y *3 Cobro* (**Alumno / Cliente**, medio de pago, comentario). Botones **Cobrar**, **Dejar por cobrar** y **Vaciar**. Descuenta stock automáticamente.
+- **Por cobrar**: ventas que se dejaron por cobrar. Acciones: **Cobrar** (elige el medio de pago), ver detalle y **anular** (devuelve el stock). Una venta por cobrar no cuenta como ingreso hasta que se cobra.
+- **Historial**: ventas con filtros por fechas, tipo de pago y estado (Pagada, Por cobrar, Anulada); ver detalle, cobrar y anular.
+- **Cierre de caja**: elige una fecha y muestra todo lo cobrado ese día, **incluidos los pagos de alumnos** (también los registrados desde *Alumnos*) y las ventas cobradas: total, efectivo esperado, tarjetas, transferencias, resumen por medio de pago y detalle. Permite ingresar el efectivo contado para ver la diferencia e **imprimir** el cierre. Los egresos del sistema son mensuales y no tienen medio de pago, por eso no se descuentan del efectivo esperado.
 
 ### Productos (`/productos`)
 Catálogo e inventario (artículos de boxeo, bebidas, snacks). Indicadores: productos activos, unidades en stock, valor del inventario y stock bajo/agotado. Filtros por código/nombre, categoría y estado de stock. Acciones: **nuevo producto** (código/SKU, categoría, nombre, precio de venta, costo, stock inicial y mínimo), **editar**, **eliminar**, **ajustar stock** (entrada por compra con documento y precio de costo, merma, ajuste, etc.) y ver movimientos de stock.
@@ -60,10 +60,12 @@ Mantenedores que alimentan el resto del sistema:
 - **Tipos de pago** (efectivo, transferencia, etc.), **Planes** (nombre, duración en meses o días y monto sugerido), **Estados de alumno** (Activo, De baja e Inactivo son del sistema y no se pueden quitar), **Categorías de producto**, **Tipos de egreso**, **Categorías Mujer** y **Categorías Hombre** (rangos de peso Amateur).
 
 ### Preguntas frecuentes
-- *¿Cómo registro el pago de un alumno?* Pagos › buscar por RUT/nombre › Registrar pago; o desde Paneles › Alumnos › «Pagos por gestionar».
+- *¿Cómo registro el pago de un alumno?* Caja y Ventas › Pago alumnos › buscar por RUT/nombre › Realizar Pago; o desde Paneles › Alumnos › «Pagos por gestionar».
 - *¿Cómo aviso a un alumno que su pago vence?* Paneles › Alumnos › Pagos por gestionar › Enviar WhatsApp (abre WhatsApp con el mensaje de la plantilla; el alumno debe tener celular).
 - *¿Cómo agrego stock?* Productos › Ajustar stock (entrada por compra).
-- *Me equivoqué en una venta*: Ventas › Historial › Anular venta.
+- *Me equivoqué en una venta*: Caja y Ventas › Historial › Anular venta (también se puede anular desde «Por cobrar»).
+- *¿Cómo dejo una venta por cobrar?* Caja y Ventas › Nueva venta › agrega los productos › **Dejar por cobrar**. Después se cobra en la pestaña «Por cobrar».
+- *¿Dónde veo cuánto se cobró hoy?* Caja y Ventas › Cierre de caja (incluye pagos de alumnos y ventas).
 - *¿Quién cambió un dato?* Usuario › Log de Auditoría.
 - *¿Cómo agrego un plan o un gasto nuevo?* Configuración › Planes / Tipos de egreso.
 

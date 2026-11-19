@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { CreditCard, MessageCircle } from 'lucide-react'
+import { CreditCard } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/gym/icons'
 import { useSettings } from '@/hooks/useSettings'
 import { useNotify } from '@/hooks/useNotify'
 import { DataGrid, Empty, Kpi } from '@/components/gym/ui'
@@ -83,12 +84,12 @@ export function StudentsTab({ D, onChanged }: { D: DashboardData; onChanged: () 
           pageSize={8}
           empty="Sin pagos vencidos ni por vencer 🎉"
           cols={[
-            { h: 'Alumno', cell: (a) => <><b>{a.full_name}</b><br /><span className="muted sm">{a.rut}</span></> },
-            { h: 'Fecha de pago', cell: (a) => fmtDate(a.last_payment!.paid_on) },
-            { h: 'Fecha de vencimiento', cell: (a) => fmtDate(a.last_payment!.due_date) },
-            { h: 'Plan · Monto', cell: (a) => `${planLabel(a.last_payment!)} · ${money(a.last_payment!.amount)}` },
+            { h: 'Alumno', w: '22%', cell: (a) => <><b>{a.full_name}</b><br /><span className="muted sm">{a.rut}</span></> },
+            { h: 'Fecha de pago', w: '12%', cell: (a) => fmtDate(a.last_payment!.paid_on) },
+            { h: 'Fecha de vencimiento', w: '14%', cell: (a) => fmtDate(a.last_payment!.due_date) },
+            { h: 'Plan · Monto', w: '22%', cell: (a) => `${planLabel(a.last_payment!)} · ${money(a.last_payment!.amount)}` },
             {
-              h: 'Estado de pago',
+              h: 'Estado de pago', w: '16%',
               cell: (a) => (
                 <>
                   <PaymentPill status={a.payment_status} />
@@ -96,12 +97,12 @@ export function StudentsTab({ D, onChanged }: { D: DashboardData; onChanged: () 
                 </>
               ),
             },
-            { h: 'Pago', cls: 'c', cell: (a) => <div className="acts"><button className="btn primary sm ico" title="Registrar pago" onClick={() => setPaying(a)}><CreditCard /></button></div> },
+            { h: 'Pago', cls: 'c', w: '7%', cell: (a) => <div className="acts"><button className="btn primary sm ico" title="Registrar pago" onClick={() => setPaying(a)}><CreditCard /></button></div> },
             {
-              h: 'WhatsApp', cls: 'c',
+              h: 'WhatsApp', cls: 'c', w: '7%',
               cell: (a) => (
                 <div className="acts">
-                  <button className="btn sm ico" style={{ background: '#25D366', borderColor: '#25D366', color: '#fff' }} title="Enviar WhatsApp" onClick={() => whatsapp(a)}><MessageCircle /></button>
+                  <button className="btn sm ico" title="Enviar WhatsApp" onClick={() => whatsapp(a)}><WhatsAppIcon /></button>
                 </div>
               ),
             },
@@ -109,7 +110,7 @@ export function StudentsTab({ D, onChanged }: { D: DashboardData; onChanged: () 
         />
       </div>
 
-      <div className="grid2">
+      <div className="grid2 eq">
         <div className="card">
           <h2>Estado de pago de alumnos activos</h2>
           <p className="sub">Según último pago registrado</p>
@@ -117,12 +118,13 @@ export function StudentsTab({ D, onChanged }: { D: DashboardData; onChanged: () 
             <Donut
               center={String(D.active_students)}
               centerSub="activos"
+              hideValues
               slices={[
-                { label: 'Vigente', value: dist.CURRENT, color: 'hsl(var(--success))', icon: '✓' },
-                { label: 'Por vencer', value: dist.DUE_SOON, color: 'hsl(var(--warning))', icon: '!' },
-                { label: 'Vencido', value: dist.OVERDUE, color: 'hsl(var(--destructive))', icon: '✕' },
-                { label: 'Sin pagos', value: dist.NONE, color: 'hsl(var(--muted-foreground))', icon: '–' },
-              ]}
+                { label: `${dist.CURRENT} Vigente`, value: dist.CURRENT, color: 'hsl(var(--success))' },
+                { label: `${dist.DUE_SOON} Por vencer`, value: dist.DUE_SOON, color: 'hsl(var(--warning))' },
+                { label: `${dist.OVERDUE} Vencido`, value: dist.OVERDUE, color: 'hsl(var(--destructive))' },
+                { label: `${dist.NONE} Sin pagos`, value: dist.NONE, color: 'hsl(var(--muted-foreground))' },
+              ].sort((x, y) => y.value - x.value)}
             />
           ) : <Empty>Sin alumnos activos</Empty>}
         </div>

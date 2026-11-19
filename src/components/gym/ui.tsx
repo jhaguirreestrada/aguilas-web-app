@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { miles, milesVal } from '@/shared/format'
 import { cleanRut, formatRut } from '@/shared/rut'
 
@@ -24,9 +24,9 @@ export function Tabs<K extends string>({ tabs, value, onChange }: { tabs: TabDef
 }
 
 /* ----------------------------- Encabezado / campos ----------------------------- */
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
+export function PageHeader({ title, subtitle, actions, compact }: { title: string; subtitle?: string; actions?: React.ReactNode; compact?: boolean }) {
   return (
-    <div className="ph">
+    <div className={compact ? 'ph sm' : 'ph'}>
       <div><h1>{title}</h1>{subtitle ? <p>{subtitle}</p> : null}</div>
       {actions}
     </div>
@@ -44,7 +44,7 @@ export function Kpi({ label, value, sub }: { label: string; value: React.ReactNo
 export const Empty = ({ children }: { children: React.ReactNode }) => <div className="empty">{children}</div>
 
 /* ----------------------------- Grilla con paginación ----------------------------- */
-export interface Col<T> { h: React.ReactNode; cls?: string; cell: (row: T, index: number) => React.ReactNode }
+export interface Col<T> { h: React.ReactNode; cls?: string; /** Ancho de columna (ej. '20%'); si alguna columna lo define, la tabla usa layout fijo. */ w?: string; cell: (row: T, index: number) => React.ReactNode }
 
 export function DataGrid<T>({
   cols, rows, pageSize = 10, empty = 'Sin registros', foot, resetKey,
@@ -57,6 +57,35 @@ export function DataGrid<T>({
   const from = (cur - 1) * pageSize
   const slice = rows.slice(from, from + pageSize)
 
+  // Anchos estables: se miden sobre una tabla fantasma con TODAS las filas (auto layout)
+  // y se aplican a la tabla visible con layout fijo, así las columnas no se mueven al paginar.
+  const fixedW = cols.some((c) => c.w)
+  const ghostBox = useRef<HTMLDivElement>(null)
+  const [widths, setWidths] = useState<number[] | null>(null)
+  const needGhost = !fixedW && pages > 1
+  useLayoutEffect(() => {
+    const box = ghostBox.current
+    if (!needGhost || !box) { setWidths(null); return }
+    const measure = () => {
+      const ths = box.querySelectorAll('thead th')
+      const w = Array.from(ths).map((t) => t.getBoundingClientRect().width)
+      const sum = w.reduce((a, b) => a + b, 0)
+      if (!sum || w.length !== cols.length) return
+      setWidths((prev) => (prev && prev.length === w.length && prev.every((v, i) => Math.abs(v - w[i]) < 0.5) ? prev : w))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(box)
+    return () => ro.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needGhost, rows, cols.length])
+  // La tabla fantasma solo se reconstruye cuando cambian las filas (no en cada render)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ghostRows = useMemo(() => (needGhost ? rows.slice(0, 100).map((r, ri) => (
+    <tr key={ri}>{cols.map((c, ci) => <td key={ci} className={c.cls}>{c.cell(r, ri)}</td>)}</tr>
+  )) : null), [needGhost, rows])
+  const wSum = widths ? widths.reduce((a, b) => a + b, 0) : 0
+
   const nums: (number | 'gap')[] = []
   let last = 0
   for (let i = 1; i <= pages; i++) {
@@ -68,8 +97,23 @@ export function DataGrid<T>({
 
   return (
     <>
-      <div className="tw">
-        <table>
+      <div className="tw" style={{ position: 'relative' }}>
+        {needGhost && (
+          <div ref={ghostBox} aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 0, overflow: 'hidden', visibility: 'hidden', pointerEvents: 'none' }}>
+            <table>
+              <thead><tr>{cols.map((c, i) => <th key={i} className={c.cls}>{c.h}</th>)}</tr></thead>
+              <tbody>
+                {ghostRows}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <table style={fixedW || (needGhost && widths) ? { tableLayout: 'fixed' } : undefined}>
+          {fixedW
+            ? <colgroup>{cols.map((c, i) => <col key={i} style={c.w ? { width: c.w } : undefined} />)}</colgroup>
+            : needGhost && widths && wSum > 0
+              ? <colgroup>{widths.map((w, i) => <col key={i} style={{ width: `${(w / wSum) * 100}%` }} />)}</colgroup>
+              : null}
           <thead><tr>{cols.map((c, i) => <th key={i} className={c.cls}>{c.h}</th>)}</tr></thead>
           <tbody>
             {slice.length ? slice.map((r, ri) => (

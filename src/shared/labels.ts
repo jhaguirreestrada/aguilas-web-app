@@ -12,4 +12,5 @@ export const PRIORITY_ORDER: ActivityPriority[] = ['critical', 'high', 'medium',
 export const ACTIVITY_LABEL: Record<ActivityStatus, string> = { pending: 'Pendiente', in_progress: 'En Proceso', done: 'Terminado', dropped: 'De baja' }
 export const ACTIVITY_TONE: Record<ActivityStatus, 'warn' | 'info' | 'ok' | ''> = { pending: 'warn', in_progress: 'info', done: 'ok', dropped: '' }
 
-export const SALE_STATUS_LABEL = { completed: 'Completada', voided: 'Anulada' } as const
+export const SALE_STATUS_LABEL = { completed: 'Pagada', pending: 'Por cobrar', voided: 'Anulada' } as const
+export const SALE_STATUS_TONE = { completed: 'ok', pending: 'warn', voided: 'bad' } as const

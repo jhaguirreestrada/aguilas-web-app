@@ -143,8 +143,8 @@ export function LineChart({ points, label }: { points: LinePoint[]; label: strin
 
 export interface DonutSlice { label: string; value: number; color: string; icon?: string }
 
-export function Donut({ slices, center, centerSub, valueFmt = (v: number) => String(v), pct = false }: {
-  slices: DonutSlice[]; center: string; centerSub: string; valueFmt?: (v: number) => string; pct?: boolean
+export function Donut({ slices, center, centerSub, valueFmt = (v: number) => String(v), pct = false, hideValues = false }: {
+  slices: DonutSlice[]; center: string; centerSub: string; valueFmt?: (v: number) => string; pct?: boolean; hideValues?: boolean
 }) {
   const total = slices.reduce((s, x) => s + x.value, 0)
   const r = 62, sw = 26, C = 2 * Math.PI * r
@@ -170,7 +170,7 @@ export function Donut({ slices, center, centerSub, valueFmt = (v: number) => Str
         {slices.map((s) => (
           <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, margin: '7px 0' }}>
             <span><i style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: s.color, marginRight: 8 }} />{s.icon ? `${s.icon} ` : ''}{s.label}</span>
-            <b>{pct ? `${total ? ((s.value / total) * 100).toFixed(0) : 0}%` : s.value}</b>
+            {!hideValues && <b>{pct ? `${total ? ((s.value / total) * 100).toFixed(0) : 0}%` : s.value}</b>}
           </div>
         ))}
       </div>

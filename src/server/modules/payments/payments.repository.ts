@@ -20,6 +20,16 @@ export class PaymentsRepository {
     return unwrap(res) as Payment[]
   }
 
+  /** Pagos de alumnos de un día (cierre de caja), con el nombre del alumno. */
+  async listPaidOn(date: string): Promise<(Payment & { student: { first_names: string; last_names: string } | null })[]> {
+    const res = await this.db
+      .from('payments')
+      .select('*, student:students(first_names, last_names)')
+      .eq('paid_on', date)
+      .order('created_at', { ascending: true })
+    return unwrap(res) as (Payment & { student: { first_names: string; last_names: string } | null })[]
+  }
+
   async insert(row: Omit<Payment, 'id' | 'created_at'>): Promise<Payment> {
     return unwrap(await this.db.from('payments').insert(row).select('*').single()) as Payment
   }

@@ -129,13 +129,22 @@ export interface Sale {
   student_id: string | null
   student_name: string
   notes: string
-  status: 'completed' | 'voided'
+  /** completed = pagada · pending = «dejada por cobrar» · voided = anulada */
+  status: 'completed' | 'pending' | 'voided'
+  /** Fecha de cobro (null mientras está por cobrar). La usan el cierre de caja y los paneles. */
+  paid_on: string | null
   voided_on: string | null
   items: SaleItem[]
 }
 
 // ---------- Egresos / planificación ----------
-export interface Expense { id: string; year: number; month: number; category: string; amount: number; detail: string }
+export interface Expense {
+  id: string; year: number; month: number
+  expense_date: string // yyyy-mm-dd
+  category: string; amount: number
+  detail: string // descripción
+  payment_method: string; comment: string
+}
 
 export type ActivityPriority = 'critical' | 'high' | 'medium' | 'low'
 export type ActivityStatus = 'pending' | 'in_progress' | 'done' | 'dropped'

@@ -8,7 +8,7 @@ export const brand = {
   badge: 'Gestión de gimnasio de boxeo',
   headline: 'Acceso al sistema de gestión',
   description:
-    'Administra alumnos, pagos, ventas, inventario, egresos y planificación del gimnasio en un solo lugar.',
+    'Administra alumnos, caja y ventas, inventario, egresos y planificación del gimnasio en un solo lugar.',
   features: [
     { text: 'Sesión protegida con cookie httpOnly firmada (JWT).' },
     { text: 'Toda acción queda registrada en el log de auditoría.' },

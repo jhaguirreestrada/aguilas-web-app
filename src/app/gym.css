@@ -16,6 +16,8 @@
 .gym .ph{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:20px}
 .gym .ph h1{font-size:24px;font-weight:800;letter-spacing:-.01em}
 .gym .ph p{color:hsl(var(--muted-foreground));font-size:13px;margin-top:2px}
+.gym .ph.sm h1{font-size:15px;font-weight:800;letter-spacing:0}
+.gym .ph.sm p{font-size:12px;margin-top:4px}
 .gym .card{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px hsl(28 18% 14%/.05)}
 .gym .card h2{font-size:15px;font-weight:800;margin-bottom:4px}
 .gym .card .sub{font-size:12px;color:hsl(var(--muted-foreground));margin-bottom:14px}
@@ -51,6 +53,7 @@
 .gym td.r, .gym th.r{text-align:right}
 .gym td.c, .gym th.c{text-align:center}
 .gym .acts{display:flex;gap:6px;justify-content:center}
+.gym .acts.start{justify-content:flex-start}
 .gym .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:hsl(var(--muted-foreground))}
 .gym .pager .pg{display:flex;gap:4px}
 .gym .pager button{min-width:30px;padding:5px 8px;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--card));cursor:pointer;font-size:12px;font-weight:600}
@@ -121,6 +124,7 @@
 .gym .delta.up{color:hsl(var(--success))}
 .gym .delta.down{color:hsl(var(--destructive))}
 .gym .grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.gym .grid2.eq{grid-template-columns:1fr 1fr}
 .gym .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
 .gym .grid2>.card, .gym .grid3>.card{margin:0}
 .gym .chart svg{width:100%;height:auto;display:block;overflow:visible}
@@ -142,15 +146,41 @@
 .gym .vsec.v3{--vc:var(--c3)}
 .gym .vsec .toolbar, .gym .vsec .tw{margin-bottom:0}
 .gym .cart-total{display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:800;padding:12px 0}
+.gym .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.gym .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid hsl(var(--border));background:hsl(var(--card));cursor:pointer;color:hsl(var(--muted-foreground))}
+.gym .chip:hover{color:hsl(var(--foreground))}
+.gym .chip.on{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:transparent}
+.gym .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;max-height:260px;overflow:auto;margin-top:8px}
+.gym .catgrid button{text-align:left;padding:9px 12px;border:1px solid hsl(var(--border));background:hsl(var(--card));border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.gym .catgrid button:hover:not(:disabled){border-color:hsl(var(--primary));background:hsl(var(--accent))}
+.gym .catgrid button:disabled{cursor:not-allowed}
+.gym .catgrid button small{color:hsl(var(--muted-foreground));font-size:12px}
+.gym .hl{background:hsl(var(--primary)/.12);border-radius:12px;padding:10px 14px}
 .gym .chiprow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .gym .sect-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:hsl(var(--primary));margin:18px 0 8px}
 .gym .pick{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .gym .pick button{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:10px 14px;border:1px solid hsl(var(--border));background:hsl(var(--card));border-radius:12px;cursor:pointer}
 .gym .pick button:hover{border-color:hsl(var(--primary));background:hsl(var(--accent))}
-@media (max-width:1100px){.gym .kpis{grid-template-columns:repeat(2,1fr)}.gym .grid2,.gym .grid3,.gym .two{grid-template-columns:1fr}}
+@media (max-width:1100px){.gym .kpis{grid-template-columns:repeat(2,1fr)}.gym .grid2,.gym .grid2.eq,.gym .grid3,.gym .two{grid-template-columns:1fr}}
 @media (max-width:640px){.gym .fg,.gym .fg3{grid-template-columns:1fr}.gym .kpis{grid-template-columns:1fr 1fr}.gym .kpi b{font-size:21px}}
 .gym-tip{position:fixed;z-index:200;pointer-events:none;padding:8px 10px;border-radius:10px;background:hsl(var(--card));border:1px solid hsl(var(--border));box-shadow:0 8px 24px #0003;font-size:12px;max-width:240px;color:hsl(var(--foreground))}
 .gym-tip b{display:block;margin-bottom:2px}
 .gym{color:hsl(var(--foreground));font-size:14px;line-height:1.5}
-.gym .btn svg,.gym .tabs svg{width:1em;height:1em}
+.gym .tabs svg{width:1em;height:1em}
+
+/* ---- Iconos de botones (mismo criterio que Vivet): más grandes, trazo firme y color con contraste ---- */
+.gym .btn svg{width:1.2em;height:1.2em;stroke-width:2.2}
+.gym .btn.sm svg,.gym .btn.ico svg{width:17px;height:17px;stroke-width:2.3}
+.gym .btn.sm{min-height:32px}
+.gym .btn.secondary svg,.gym .btn.ghost svg{color:hsl(var(--foreground))}
+.gym .btn.secondary:hover:not(:disabled) svg,.gym .btn.ghost:hover:not(:disabled) svg{color:hsl(var(--primary))}
+.gym .btn.ghost{border-color:hsl(var(--border))}
+/* acciones destructivas (eliminar / anular / dar de baja) en rojo legible */
+.gym .btn:is(.secondary,.ghost):has(svg[class*="lucide-trash"],svg[class*="lucide-ban"],svg[class*="lucide-user-x"]),
+.gym .btn:is(.secondary,.ghost):has(svg[class*="lucide-trash"],svg[class*="lucide-ban"],svg[class*="lucide-user-x"]) svg{color:hsl(var(--destructive))}
+.gym .btn:is(.secondary,.ghost):has(svg[class*="lucide-trash"],svg[class*="lucide-ban"],svg[class*="lucide-user-x"]):hover:not(:disabled){background:hsl(var(--destructive)/.12);border-color:hsl(var(--destructive)/.4)}
+/* WhatsApp: botón verde con icono blanco nítido */
+.gym .btn:has(svg.lucide-wa){background:#25D366;border-color:#25D366;color:#fff;box-shadow:0 4px 12px #25d36640}
+.gym .btn:has(svg.lucide-wa) svg{color:#fff;width:19px;height:19px;stroke-width:2.2}
+.gym .btn:has(svg.lucide-wa):hover:not(:disabled){background:#1ebe5b;border-color:#1ebe5b}
 
