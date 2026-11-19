@@ -89,7 +89,7 @@ src/features, components/   UI
 - **Auditoría**: triggers en 14 tablas → `audit_log` (inmutable). El actor llega por cabeceras `x-actor-*` (PostgREST) o `set_config('app.actor_username', …)` (conexión SQL directa). `password_hash` nunca se registra.
 
 ## Versión
-Se lee de `version` en `package.json` (1.0.0) y se muestra en el menú lateral.
+Se lee de `version` en `package.json` (1.0.2) y se muestra en el menú lateral.
 
 ## Importar los datos del HTML
 La pantalla de respaldo fue retirada del menú; la API `POST /api/backup/import` (con sesión) sigue disponible.

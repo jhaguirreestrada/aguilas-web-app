@@ -6,11 +6,14 @@ import { api, errMsg } from '@/lib/api-client'
 import { useFetch } from '@/hooks/useFetch'
 import { useSettings } from '@/hooks/useSettings'
 import { useNotify } from '@/hooks/useNotify'
-import { Field, opts } from '@/components/gym/ui'
+import { Field, MoneyInput, opts } from '@/components/gym/ui'
+import { RotateCcw } from 'lucide-react'
 import { money, norm } from '@/shared/format'
 import type { Product, Sale, StudentSummary } from '@/shared/types'
 
-export interface CartLine { product_id: string; name: string; price: number; quantity: number }
+/** `amount` = subtotal editado a mano (null = precio de lista × cantidad). */
+export interface CartLine { product_id: string; name: string; price: number; quantity: number; amount?: number | null }
+const lineTotal = (l: CartLine) => l.amount ?? l.price * l.quantity
 
 /**
  * Pestaña «Nueva venta». Mismo diseño que «Caja y ventas» de Vivet:
@@ -36,7 +39,7 @@ export default function NewSale({ cart, setCart, onSaved }: { cart: CartLine[]; 
     const t = norm(q)
     return active.filter((p) => (!cat || p.category === cat) && (!t || norm(`${p.name} ${p.code} ${p.category}`).includes(t))).slice(0, 60)
   }, [active, cat, q])
-  const total = cart.reduce((s, l) => s + l.price * l.quantity, 0)
+  const total = cart.reduce((s, l) => s + lineTotal(l), 0)
   const methodVal = method || cfg?.payment_methods[0] || ''
 
   const add = (p: Product) => {
@@ -44,15 +47,19 @@ export default function NewSale({ cart, setCart, onSaved }: { cart: CartLine[]; 
     const qty = (ya?.quantity ?? 0) + 1
     if (qty > p.stock) return notify.error(`Stock insuficiente de "${p.name}" (disponible: ${p.stock})`)
     setErr('')
-    setCart(ya ? cart.map((l) => (l === ya ? { ...l, quantity: qty } : l)) : [...cart, { product_id: p.id, name: p.name, price: p.price, quantity: 1 }])
+    setCart(ya ? cart.map((l) => (l === ya ? { ...l, quantity: qty, amount: l.amount == null ? null : Math.round((l.amount / l.quantity) * qty) } : l)) : [...cart, { product_id: p.id, name: p.name, price: p.price, quantity: 1 }])
   }
 
   const setQty = (i: number, raw: number) => {
     const p = byId.get(cart[i].product_id)
     let n = Math.max(1, Math.floor(raw) || 1)
     if (p && n > p.stock) { n = p.stock; notify.error(`Stock máximo: ${p.stock}`) }
-    setCart(cart.map((l, j) => (j === i ? { ...l, quantity: n } : l)))
+    // Si el subtotal fue editado, se conserva el precio unitario editado al cambiar la cantidad
+    setCart(cart.map((l, j) => (j === i ? { ...l, quantity: n, amount: l.amount == null ? null : Math.round((l.amount / l.quantity) * n) } : l)))
   }
+
+  const setAmount = (i: number, v: number | '') => setCart(cart.map((l, j) => (j === i ? { ...l, amount: v === '' ? 0 : v } : l)))
+  const resetAmount = (i: number) => setCart(cart.map((l, j) => (j === i ? { ...l, amount: null } : l)))
 
   // Enter en el buscador: coincidencia exacta de código (lector de barras) o único resultado
   const onSearchEnter = () => {
@@ -69,7 +76,7 @@ export default function NewSale({ cart, setCart, onSaved }: { cart: CartLine[]; 
     setBusy(true); setErr('')
     try {
       const sale = await api.post<Sale>('/api/sales', {
-        items: cart.map((l) => ({ product_id: l.product_id, quantity: l.quantity })),
+        items: cart.map((l) => ({ product_id: l.product_id, quantity: l.quantity, ...(l.amount != null ? { amount: l.amount } : {}) })),
         pending, payment_method: pending ? '' : methodVal, student_id: studentId || null, notes: notes.trim(),
       })
       notify.ok(`Venta N° ${sale.sale_number} ${pending ? 'guardada por cobrar' : 'cobrada'}: ${money(sale.total)}`)
@@ -111,9 +118,18 @@ export default function NewSale({ cart, setCart, onSaved }: { cart: CartLine[]; 
                 <tbody>
                   {cart.map((l, i) => (
                     <tr key={l.product_id}>
-                      <td>{l.name}<br /><span className="muted sm">{money(l.price)} c/u</span></td>
+                      <td>
+                        {l.name}<br />
+                        <span className="muted sm">{money(l.amount != null ? Math.round(l.amount / l.quantity) : l.price)} c/u</span>
+                        {l.amount != null && l.amount !== l.price * l.quantity && (
+                          <> <span className="pill warn">Precio modificado</span>{' '}
+                            <button type="button" className="btn ghost sm ico" title={`Volver al precio de lista (${money(l.price * l.quantity)})`} onClick={() => resetAmount(i)}><RotateCcw /></button></>
+                        )}
+                      </td>
                       <td style={{ width: 84 }}><input type="number" min={1} value={l.quantity} onChange={(e) => setQty(i, Number(e.target.value))} /></td>
-                      <td className="r b">{money(l.price * l.quantity)}</td>
+                      <td className="r" style={{ width: 130 }}>
+                        <MoneyInput style={{ textAlign: 'right', fontWeight: 700 }} maxLength={12} aria-label={`Subtotal de ${l.name}`} value={lineTotal(l)} onChange={(v) => setAmount(i, v)} />
+                      </td>
                       <td className="c" style={{ width: '1%' }}><button type="button" className="btn ghost sm ico" title="Quitar" onClick={() => setCart(cart.filter((_, j) => j !== i))}><Trash2 /></button></td>
                     </tr>
                   ))}
@@ -139,7 +155,7 @@ export default function NewSale({ cart, setCart, onSaved }: { cart: CartLine[]; 
           <p className="err" style={{ fontWeight: 600 }}>{err}</p>
           <div className="row-actions" style={{ margin: 0 }}>
             <button className="btn primary" onClick={() => submit(false)} disabled={busy || !cart.length}><Banknote /> Cobrar</button>
-            <button className="btn secondary" onClick={() => submit(true)} disabled={busy || !cart.length}>Dejar por cobrar</button>
+            <button className="btn warn" onClick={() => submit(true)} disabled={busy || !cart.length}>Por Cobrar</button>
             <button className="btn ghost" onClick={() => { setCart([]); setErr('') }} disabled={busy}>Vaciar</button>
           </div>
         </div>

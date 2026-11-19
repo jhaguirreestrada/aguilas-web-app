@@ -27,6 +27,8 @@
 .gym .btn.action{background:linear-gradient(90deg,hsl(var(--action)),hsl(var(--action-to)));color:#fff;box-shadow:0 6px 16px hsl(var(--action)/.25)}
 .gym .btn.secondary{background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));border-color:hsl(var(--border))}
 .gym .btn.danger{background:hsl(var(--destructive));color:#fff}
+.gym .btn.warn{background:hsl(var(--warning)/.17);color:hsl(38 90% 30%);border-color:hsl(var(--warning)/.45)}
+.dark .gym .btn.warn{color:hsl(var(--warning))}
 .gym .btn.ghost{background:transparent;color:hsl(var(--foreground))}
 .gym .btn:hover:not(:disabled){filter:brightness(1.07)}
 .gym .btn.sm{padding:6px 9px;font-size:12px;border-radius:10px}
