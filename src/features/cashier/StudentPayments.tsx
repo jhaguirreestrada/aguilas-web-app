@@ -6,7 +6,7 @@ import { api, errMsg, qs } from '@/lib/api-client'
 import { useDebounced } from '@/hooks/useDebounced'
 import { useNotify } from '@/hooks/useNotify'
 import { Empty, Field, Tabs } from '@/components/gym/ui'
-import { PaymentHistoryGrid, PaymentModal, PaymentPill, StudentStatusPill } from '@/features/common/payments'
+import { PaymentHistoryGrid, PaymentModal, PaymentPill, PendingNote, StudentStatusPill } from '@/features/common/payments'
 import { fmtDate, money } from '@/shared/format'
 import { planLabel } from '@/shared/domain/payments'
 import type { Payment, StudentSummary } from '@/shared/types'
@@ -113,10 +113,12 @@ export default function StudentPayments() {
                     <div><span>Plan · Monto</span><b>{planLabel(up)} · {money(up.amount)}</b></div>
                     <div><span>Tipo de pago</span><b>{up.payment_method}</b></div>
                     <div className="est-row"><span>Estado de pago</span><b><PaymentPill status={e} /></b></div>
+                    {selected.pending_count > 0 && <div className="est-row"><span>Clases por cobrar</span><b><PendingNote s={selected} /></b></div>}
                     <div><span>{e.key === 'OVERDUE' ? 'Días de retraso' : 'Días restantes'}</span>
                       <b style={e.key === 'OVERDUE' ? { color: 'hsl(var(--destructive))' } : undefined}>{e.key === 'OVERDUE' ? e.days_overdue : e.days_left}</b></div>
                   </div>
                 ) : <Empty>Sin pagos registrados</Empty>}
+                {!up && selected.pending_count > 0 && <p style={{ marginTop: 8 }}><PendingNote s={selected} /></p>}
               </div>
               <div className="card" style={{ order: 2 }}>
                 <div className="kv">

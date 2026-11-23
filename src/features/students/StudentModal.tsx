@@ -8,7 +8,7 @@ import { useNotify } from '@/hooks/useNotify'
 import { useConfirm } from '@/components/providers/ConfirmProvider'
 import { GymModal } from '@/components/gym/GymModal'
 import { DataGrid, Empty, Field, RutInput, Tabs, opts } from '@/components/gym/ui'
-import { PaymentHistoryGrid, PaymentModal, PaymentPill } from '@/features/common/payments'
+import { PaymentHistoryGrid, PaymentModal, PaymentPill, PendingNote } from '@/features/common/payments'
 import { fmtDate, money } from '@/shared/format'
 import { todayIso } from '@/shared/dates'
 import { planLabel } from '@/shared/domain/payments'
@@ -160,10 +160,12 @@ export function StudentModal({ studentId, onClose, onSaved }: Props) {
                       <div><span>Plan · Monto</span><b>{planLabel(up)} · {money(up.amount)}</b></div>
                       <div><span>Tipo de pago</span><b>{up.payment_method}</b></div>
                       <div><span>Estado de pago</span><b><PaymentPill status={st} /></b></div>
+                      {student && student.pending_count > 0 && <div><span>Clases por cobrar</span><b><PendingNote s={student} /></b></div>}
                       <div><span>{st.key === 'OVERDUE' ? 'Días de retraso' : 'Días restantes'}</span>
                         <b style={st.key === 'OVERDUE' ? { color: 'hsl(var(--destructive))' } : undefined}>{st.key === 'OVERDUE' ? st.days_overdue : st.days_left}</b></div>
                     </div>
                   ) : <Empty>El alumno aún no registra pagos</Empty>}
+                  {!up && student && student.pending_count > 0 && <p style={{ marginTop: 8 }}><PendingNote s={student} /></p>}
                   <div className="sect-title" style={{ marginTop: 28 }}>Historial de pagos</div>
                   <PaymentHistoryGrid payments={payments} pageSize={5} />
                 </div>

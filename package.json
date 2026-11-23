@@ -1,6 +1,6 @@
 {
   "name": "aguilas-gym",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Águilas Boxeo Hualpén — Gestión (Next.js + Supabase/Postgres)",
   "scripts": {

@@ -39,5 +39,18 @@ export const paymentSchema = z.object({
   amount: z.number({ invalid_type_error: 'Ingresa un monto mayor a 0' }).int().gt(0, 'Ingresa un monto mayor a 0'),
   paid_on: isoDate.optional(),
   notes: z.string().trim().max(200).default(''),
+  /** Solo planes diarios: registra la clase como «por cobrar» (acumulativa) en vez de cobrarla ahora. */
+  pending: z.boolean().default(false),
 })
 export type PaymentDto = z.infer<typeof paymentSchema>
+
+/** Cobro de una o varias clases diarias que estaban por cobrar. */
+export const settleSchema = z.object({
+  student_id: z.string().uuid('Alumno inválido'),
+  payment_ids: z.array(z.string().uuid()).min(1, 'Selecciona al menos una clase por cobrar').max(100),
+  payment_method: z.string().trim().min(1, 'Selecciona el tipo de pago'),
+  amount: z.number({ invalid_type_error: 'Ingresa un monto mayor a 0' }).int().gt(0, 'Ingresa un monto mayor a 0'),
+  paid_on: isoDate.optional(),
+  notes: z.string().trim().max(200).default(''),
+})
+export type SettleDto = z.infer<typeof settleSchema>

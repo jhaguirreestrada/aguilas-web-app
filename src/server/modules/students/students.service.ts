@@ -22,7 +22,9 @@ export class StudentsService {
     return todayIso(env().APP_TIMEZONE)
   }
 
-  private summarize(s: Student, ps: Payment[], cfg: Settings, today: string): StudentSummary {
+  private summarize(s: Student, all: Payment[], cfg: Settings, today: string): StudentSummary {
+    const ps = all.filter((p) => !p.pending)
+    const pend = all.filter((p) => p.pending)
     const last = lastPayment(ps)
     return {
       ...s,
@@ -32,12 +34,15 @@ export class StudentsService {
       last_payment: last,
       payment_status: paymentStatus(last, cfg.warning_days, today),
       payments_count: ps.length,
+      pending_count: pend.length,
+      pending_amount: pend.reduce((t, p) => t + p.amount, 0),
     }
   }
 
   /** Alumnos con su último pago, estado de pago, categoría y edad (ordenados por nombre). */
   async listSummaries(): Promise<StudentSummary[]> {
     const [students, payments, cfg] = await Promise.all([this.students.listAll(), this.payments.listAll(), this.settings.get()])
+    const pendings = await this.payments.listPending()
     const today = this.today()
     const byStudent = new Map<string, Payment[]>()
     for (const p of payments) {
@@ -45,6 +50,7 @@ export class StudentsService {
       if (arr) arr.push(p)
       else byStudent.set(p.student_id, [p])
     }
+    for (const p of pendings) byStudent.get(p.student_id)?.push(p) ?? byStudent.set(p.student_id, [p])
     return students
       .map((s) => this.summarize(s, byStudent.get(s.id) ?? [], cfg, today))
       .sort((a, b) => a.full_name.localeCompare(b.full_name, 'es'))

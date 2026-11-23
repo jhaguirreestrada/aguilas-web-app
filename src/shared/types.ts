@@ -57,6 +57,10 @@ export interface Payment {
   due_date: string
   notes: string
   created_at: string
+  /** Clase diaria tomada y aún no cobrada (acumulativa): no es ingreso ni cuenta como último pago. */
+  pending?: boolean | null
+  /** Fecha en que se tomó la clase diaria (si se dejó por cobrar). */
+  class_on?: string | null
 }
 
 export type PaymentStatusKey = 'CURRENT' | 'DUE_SOON' | 'OVERDUE' | 'NONE'
@@ -75,6 +79,9 @@ export interface StudentSummary extends Student {
   last_payment: Payment | null
   payment_status: PaymentStatus
   payments_count: number
+  /** Clases diarias por cobrar (acumuladas). */
+  pending_count: number
+  pending_amount: number
 }
 
 export interface WeightEntry { id: string; weight_kg: number; recorded_at: string }

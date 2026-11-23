@@ -1,14 +1,14 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { History, Pencil, Plus, Trash2 } from 'lucide-react'
+import { CreditCard, Pencil, Plus, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api-client'
 import { useFetch } from '@/hooks/useFetch'
 import { useSettings } from '@/hooks/useSettings'
 import { useNotify } from '@/hooks/useNotify'
 import { useConfirm } from '@/components/providers/ConfirmProvider'
 import { DataGrid, Field, PageHeader, opts } from '@/components/gym/ui'
-import { PaymentHistoryModal, PaymentModal, PaymentPill, StudentStatusPill } from '@/features/common/payments'
+import { PaymentModal, PaymentPill, PendingNote, StudentStatusPill } from '@/features/common/payments'
 import { StudentModal } from '@/features/students/StudentModal'
 import { fmtDate, norm } from '@/shared/format'
 import { cleanRut } from '@/shared/rut'
@@ -23,7 +23,6 @@ export default function StudentsPage() {
   const { data, loading, reload } = useFetch<StudentSummary[]>('/api/students')
   const [f, setF] = useState({ rut: '', name: '', status: '', pay: '' })
   const [editing, setEditing] = useState<string | null | undefined>(undefined) // undefined = cerrado, null = nuevo
-  const [history, setHistory] = useState<StudentSummary | null>(null)
   const [paying, setPaying] = useState<StudentSummary | null>(null)
 
   const rows = useMemo(() => {
@@ -81,12 +80,13 @@ export default function StudentsPage() {
             { h: 'Último estado de pago', cell: (a) => (
               <>
                 <PaymentPill status={a.payment_status} />
+                {a.pending_count > 0 && <><br /><PendingNote s={a} /></>}
                 {a.last_payment && <><br /><span className="muted sm">Vence {fmtDate(a.last_payment.due_date)}{a.payment_status.days_overdue ? ` · ${a.payment_status.days_overdue} d. retraso` : ''}</span></>}
               </>
             ) },
             { h: 'Editar', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Editar" onClick={() => setEditing(a.id)}><Pencil /></button></div> },
             { h: 'Eliminar', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Eliminar" style={{ color: 'hsl(var(--destructive))' }} onClick={() => remove(a)}><Trash2 /></button></div> },
-            { h: 'Historial de Pagos', cls: 'c', cell: (a) => <div className="acts"><button className="btn secondary sm ico" title="Historial de pagos" onClick={() => setHistory(a)}><History /></button></div> },
+            { h: 'Realizar Pago', cls: 'c', cell: (a) => <div className="acts"><button className="btn primary sm ico" title={a.status === 'De baja' ? 'Alumno de baja' : 'Realizar pago'} disabled={a.status === 'De baja'} onClick={() => setPaying(a)}><CreditCard /></button></div> },
             { h: 'WhatsApp', cls: 'c', cell: (a) => <div className="acts"><button className="btn sm ico" title="Enviar WhatsApp" onClick={() => whatsapp(a)}><WhatsAppIcon /></button></div> },
           ]}
         />
@@ -102,7 +102,6 @@ export default function StudentsPage() {
           }}
         />
       )}
-      {history && <PaymentHistoryModal studentId={history.id} title={<><b style={{ color: 'hsl(var(--foreground))' }}>{history.full_name}</b> · {history.rut}</>} onClose={() => setHistory(null)} />}
       {paying && <PaymentModal student={paying} onClose={() => setPaying(null)} onDone={reload} />}
     </div>
   )
